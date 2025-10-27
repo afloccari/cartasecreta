@@ -1,0 +1,362 @@
+body {
+    background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+    font-family: 'Arial', sans-serif;
+    padding: 40px;
+    color: #333;
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.carta-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 10;
+}
+
+.linea {
+    opacity: 0;
+    transform: translateY(20px);
+    margin-bottom: 20px;
+    min-height: 24px;
+    transition: all 0.5s ease;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+/* 🎯 ESTILOS DEL CURSOR - AÑADE ESTO */
+.cursor {
+    display: inline-block;
+    width: 3px;
+    height: 20px;
+    background: #ff6b6b;
+    margin-left: 2px;
+    animation: parpadeo 1s infinite;
+}
+
+@keyframes parpadeo {
+    0%, 100% { 
+        opacity: 1; 
+    }
+    50% { 
+        opacity: 0; 
+    }
+}
+
+@keyframes flotar {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.corazon-flotante {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1;
+    animation: flotar 5s linear forwards;
+}
+
+.mensaje-final {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 24px;
+    opacity: 0;
+    animation: aparecer 2s forwards;
+    animation-delay: 1s;
+}
+
+@keyframes aparecer {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Añade estos estilos para los iconos de línea */
+.linea-con-icono {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.icono-linea {
+    color: #ff6b6b;
+    font-size: 1.3em;
+    min-width: 30px;
+    margin-top: 2px;
+}
+
+.texto-linea {
+    flex: 1;
+}
+
+.texto-solo {
+    display: block;
+    margin-bottom: 20px;
+}
+
+/* Mejora los corazones flotantes */
+.corazon-flotante i {
+    animation: latido 2s ease-in-out infinite;
+}
+
+@keyframes latido {
+    0%, 100% { 
+        transform: scale(1); 
+    }
+    50% { 
+        transform: scale(1.2); 
+    }
+}
+
+
+
+/* Modal de clave secreta */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.modal-contenido {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: aparecerModal 0.5s ease-out;
+}
+
+@keyframes aparecerModal {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    margin-bottom: 25px;
+}
+
+.modal-header i {
+    font-size: 3em;
+    color: #ff6b6b;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.modal-header h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.2em;
+    color: #333;
+    margin: 0;
+}
+
+.modal-body {
+    margin-bottom: 20px;
+}
+
+.modal-body p {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+#inputClave {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1.1em;
+    text-align: center;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    font-family: 'Open Sans', sans-serif;
+}
+
+#inputClave:focus {
+    outline: none;
+    border-color: #ff6b6b;
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+}
+
+#btnValidar {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+}
+
+#btnValidar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+}
+
+#btnValidar:active {
+    transform: translateY(0);
+}
+
+.modal-footer {
+    margin-top: 20px;
+}
+
+.pista {
+    font-size: 0.9em;
+    color: #888;
+    font-style: italic;
+}
+
+/* Efectos de error y éxito */
+.input-error {
+    border-color: #ff4757 !important;
+    background-color: #fff5f5;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.input-correcto {
+    border-color: #2ed573 !important;
+    background-color: #f1fff7;
+}
+
+.mensaje-error {
+    color: #ff4757;
+    font-size: 0.9em;
+    margin-top: 10px;
+    min-height: 20px;
+}
+
+/* Control de música */
+.control-musica {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.control-musica:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+.btn-musica {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-musica:hover {
+    transform: scale(1.05);
+}
+
+.btn-musica.musica-activa {
+    background: linear-gradient(135deg, #2ed573, #7bed9f);
+    animation: pulso 2s infinite;
+}
+
+@keyframes pulso {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.btn-musica i {
+    font-size: 1.2em;
+}
+
+.volumen-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.control-volumen {
+    width: 80px;
+    height: 6px;
+    border-radius: 3px;
+    background: #e0e0e0;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.control-volumen:hover {
+    opacity: 1;
+}
+
+.control-volumen::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ff6b6b;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.control-volumen::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ff6b6b;
+    cursor: pointer;
+    border: none;
+}

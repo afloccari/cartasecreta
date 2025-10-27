@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta para Enana - Feliz Cumpleaños 32</title>
+    <link rel="stylesheet" href="index.css">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts para tipografía bonita -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="carta-container">
+        <!-- Encabezado con icono -->
+        <div class="encabezado">
+            <i class="fas fa-heart icono-titulo"></i>
+            <h1>Para Mi Amor</h1>
+        </div>
+        
+        <div id="carta"></div>
+        
+        <!-- Firma con iconos -->
+        <div class="firma mt-2">
+            <div class="iconos-firma">
+                <!-- <i class="fas fa-heartbeat"></i> -->
+                <!-- <i class="fas fa-kiss-wink-heart"></i> -->
+                <!-- <i class="fas fa-infinity"></i> -->
+            </div>
+        </div>
+    </div>
+
+<!-- Control de música -->
+<div id="controlMusica" class="control-musica">
+    <button id="btnMusica" class="btn-musica">
+        <i class="fas fa-music"></i>
+        <span>Música</span>
+    </button>
+    <div class="volumen-container">
+        <input type="range" id="volumen" min="0" max="100" value="50" class="control-volumen">
+    </div>
+</div>
+
+<!-- Audio element -->
+<audio id="musicaRomantica" loop>
+    <source src="assets/musica.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Modal para la clave secreta -->
+<div id="modalClave" class="modal">
+    <div class="modal-contenido">
+        <div class="modal-header">
+            <i class="fas fa-lock"></i>
+            <h2>Carta Secreta</h2>
+        </div>
+        <div class="modal-body">
+            <p>Ingresá la palabra clave para descubrir tu sorpresa:</p>
+            <input type="text" id="inputClave" placeholder="Escribí aquí..." autocomplete="off">
+            <button id="btnValidar">Descubrir</button>
+        </div>
+        <div class="modal-footer">
+            <p class="pista">💡 Pista: Es un lugar especial para nosotros</p>
+        </div>
+    </div>
+</div>
+    
+    <script src="index.js"></script>
+</body>
+</html>
