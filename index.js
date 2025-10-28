@@ -49,12 +49,99 @@ const carta = [
     { texto: "Andrés", icono: "fas fa-signature" }
 ];
 
-// Clave secreta
-const CLAVE_SECRETA = 'CACHI';
+const { DateTime } = luxon;
 
-// Sistema de autenticación mejorado
-function inicializarSistema() {
+// Configuración de fecha objetivo - 29 de Octubre a las 00:00 (hora Argentina)
+const FECHA_OBJETIVO = DateTime.fromObject({
+    year: 2025,
+    month: 10,
+    day: 29,
+    hour: 0,
+    minute: 0,
+    second: 0
+}, { zone: 'America/Argentina/Buenos_Aires' });
+
+// Sistema principal de inicialización
+function inicializarAplicacion() {
+    const ahora = DateTime.now().setZone('America/Argentina/Buenos_Aires');
+    
+    // Verificar si ya pasó la fecha objetivo
+    if (ahora >= FECHA_OBJETIVO) {
+        // Fecha cumplida - ir directamente al sistema de clave
+        inicializarSistemaClave();
+    } else {
+        // Fecha NO cumplida - mostrar countdown
+        inicializarCountdown();
+    }
+}
+
+// Sistema de countdown (solo se muestra si la fecha NO se cumplió)
+function inicializarCountdown() {
+    const countdownContainer = document.getElementById('countdownContainer');
+    const modalClave = document.getElementById('modalClave');
+    
+    // Mostrar countdown y ocultar modal de clave
+    countdownContainer.style.display = 'flex';
+    modalClave.style.display = 'none';
+    
+    actualizarCountdown();
+    
+    // Actualizar cada segundo
+    const countdownInterval = setInterval(actualizarCountdown, 1000);
+    
+    function actualizarCountdown() {
+        const ahora = new Date();
+        const diferencia = FECHA_OBJETIVO - ahora;
+        
+        if (diferencia <= 0) {
+            // ¡Llegó la fecha!
+            clearInterval(countdownInterval);
+            finalizarCountdown();
+            return;
+        }
+        
+        // Calcular días, horas, minutos, segundos
+        const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+        const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+        const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+        
+        // Actualizar display
+        document.getElementById('dias').textContent = dias.toString().padStart(2, '0');
+        document.getElementById('horas').textContent = horas.toString().padStart(2, '0');
+        document.getElementById('minutos').textContent = minutos.toString().padStart(2, '0');
+        document.getElementById('segundos').textContent = segundos.toString().padStart(2, '0');
+        
+        // Efectos especiales cuando faltan pocos segundos
+        if (dias === 0 && horas === 0 && minutos < 5) {
+            document.querySelectorAll('.countdown-item').forEach(item => {
+                item.style.animation = 'pulsoRapido 0.5s infinite';
+            });
+        }
+    }
+    
+    function finalizarCountdown() {
+        const countdownContainer = document.getElementById('countdownContainer');
+        const countdownContent = document.querySelector('.countdown-content');
+        
+        // Efecto de finalización
+        countdownContent.classList.add('countdown-terminado');
+        
+        // Crear efecto de confeti
+        crearConfetiFinal();
+        
+        // Esperar a que termine la animación y mostrar el sistema de clave
+        setTimeout(() => {
+            countdownContainer.style.display = 'none';
+            inicializarSistemaClave();
+        }, 1000);
+    }
+}
+
+// Sistema de clave (solo se muestra si la fecha SE cumplió)
+function inicializarSistemaClave() {
     const modal = document.getElementById('modalClave');
+    const countdownContainer = document.getElementById('countdownContainer');
     const inputClave = document.getElementById('inputClave');
     const btnValidar = document.getElementById('btnValidar');
     const mensajeError = document.createElement('div');
@@ -62,8 +149,9 @@ function inicializarSistema() {
     mensajeError.className = 'mensaje-error';
     document.querySelector('.modal-body').appendChild(mensajeError);
 
-    // Mostrar modal
+    // Mostrar modal de clave y ocultar countdown
     modal.style.display = 'flex';
+    countdownContainer.style.display = 'none';
 
     // Validar al hacer click
     btnValidar.addEventListener('click', validarClave);
@@ -83,7 +171,7 @@ function inicializarSistema() {
             return;
         }
 
-        if (input === CLAVE_SECRETA) {
+        if (input === 'CACHI') {
             // Clave correcta
             inputClave.classList.remove('input-error');
             inputClave.classList.add('input-correcto');
@@ -93,8 +181,6 @@ function inicializarSistema() {
                 modal.style.display = 'none';
                 // Mostrar control de música
                 document.getElementById('controlMusica').style.display = 'flex';
-                // Inicializar sistema de música
-                inicializarMusica();
                 // Iniciar carta
                 escribirCarta();
             }, 1500);
@@ -126,6 +212,8 @@ function inicializarMusica() {
     const btnMusica = document.getElementById('btnMusica');
     const controlVolumen = document.getElementById('volumen');
     
+    if (!audio || !btnMusica || !controlVolumen) return;
+    
     // Configurar volumen inicial
     audio.volume = controlVolumen.value / 100;
     
@@ -138,16 +226,8 @@ function inicializarMusica() {
                 btnMusica.innerHTML = '<i class="fas fa-pause"></i><span>Pausar</span>';
             }).catch(error => {
                 console.log('Error reproduciendo música:', error);
-                // Fallback: cambiar el texto del botón
+                // Fallback
                 btnMusica.innerHTML = '<i class="fas fa-play"></i><span>Click para activar</span>';
-                // Remover el event listener temporalmente y asignar uno nuevo
-                btnMusica.replaceWith(btnMusica.cloneNode(true));
-                document.getElementById('btnMusica').addEventListener('click', function() {
-                    audio.play().then(() => {
-                        this.classList.add('musica-activa');
-                        this.innerHTML = '<i class="fas fa-pause"></i><span>Pausar</span>';
-                    });
-                });
             });
         } else {
             // Pausar música
@@ -165,14 +245,13 @@ function inicializarMusica() {
         audio.volume = this.value / 100;
     });
     
-    // Intentar reproducir automáticamente (pero manejando el error)
+    // Intentar reproducir automáticamente
     setTimeout(() => {
         audio.play().then(() => {
             btnMusica.classList.add('musica-activa');
             btnMusica.innerHTML = '<i class="fas fa-pause"></i><span>Pausar</span>';
         }).catch(error => {
-            console.log('Autoplay bloqueado, esperando interacción del usuario');
-            // No hacer nada - el usuario tendrá que hacer click manualmente
+            console.log('Autoplay bloqueado');
         });
     }, 1000);
 }
@@ -325,5 +404,59 @@ function agregarMensajeFinal() {
     document.querySelector('.carta-container').appendChild(mensajeFinal);
 }
 
+// Efecto de confeti cuando termina el countdown
+function crearConfetiFinal() {
+    const confetiContainer = document.getElementById('countdownContainer');
+    const confetiColors = ['#ff6b6b', '#ff8e8e', '#ffafbd', '#a8e6cf', '#dcedc1', '#ffd3b6'];
+    const confetiShapes = ['❀', '✨', '⭐', '💖', '🎀', '🌸'];
+    
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const confeti = document.createElement('div');
+            confeti.className = 'confeti';
+            confeti.innerHTML = confetiShapes[Math.floor(Math.random() * confetiShapes.length)];
+            confeti.style.position = 'absolute';
+            confeti.style.left = Math.random() * 100 + 'vw';
+            confeti.style.top = '-50px';
+            confeti.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            confeti.style.color = confetiColors[Math.floor(Math.random() * confetiColors.length)];
+            confeti.style.animation = `caerConfeti ${Math.random() * 3 + 2}s linear forwards`;
+            confeti.style.zIndex = '2001';
+            confeti.style.pointerEvents = 'none';
+            
+            if (confetiContainer) {
+                confetiContainer.appendChild(confeti);
+            }
+            
+            setTimeout(() => {
+                if (confeti.parentNode) {
+                    confeti.parentNode.removeChild(confeti);
+                }
+            }, 5000);
+        }, i * 100);
+    }
+}
+
+// Añadir animaciones al CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes pulsoRapido {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    @keyframes caerConfeti {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+
 // Iniciar cuando la página cargue
-window.onload = inicializarSistema;
+window.onload = inicializarAplicacion;
