@@ -181,6 +181,8 @@ function inicializarSistemaClave() {
                 modal.style.display = 'none';
                 // Mostrar control de música
                 document.getElementById('controlMusica').style.display = 'flex';
+                // Inicializar listeners del botón de música
+                inicializarMusica();
                 // Iniciar carta
                 escribirCarta();
             }, 1500);
@@ -208,36 +210,104 @@ function inicializarSistemaClave() {
 
 // Sistema de música romántica
 function inicializarMusica() {
+
     const audio = document.getElementById('musicaRomantica');
     const btnMusica = document.getElementById('btnMusica');
     const controlVolumen = document.getElementById('volumen');
-    
-    if (!audio || !btnMusica || !controlVolumen) return;
-    
+    // if (!audio || !btnMusica || !controlVolumen) return;
+
+    // Mensaje de error para el usuario
+    let mensajeAudio = document.getElementById('mensajeAudio');
+    if (!mensajeAudio) {
+        mensajeAudio = document.createElement('div');
+        mensajeAudio.id = 'mensajeAudio';
+        mensajeAudio.style.color = '#ff4757';
+        mensajeAudio.style.fontSize = '0.95em';
+        mensajeAudio.style.marginTop = '8px';
+        mensajeAudio.style.display = 'none';
+        btnMusica.parentNode.appendChild(mensajeAudio);
+    }
+
+    // Evitar listeners duplicados
+    if (!audio._musicaListeners) {
+        audio.addEventListener('canplaythrough', function() {
+            console.log('Audio cargado correctamente.');
+            if (mensajeAudio) {
+                mensajeAudio.textContent = 'Audio listo para reproducir.';
+                mensajeAudio.style.color = '#2ed573';
+                mensajeAudio.style.display = 'block';
+                setTimeout(() => { mensajeAudio.style.display = 'none'; }, 2000);
+            }
+        });
+        audio.addEventListener('error', function(e) {
+            console.log('Error cargando el audio:', e);
+            if (mensajeAudio) {
+                mensajeAudio.textContent = 'No se pudo cargar el audio. Verifica la ruta o el formato.';
+                mensajeAudio.style.color = '#ff4757';
+                mensajeAudio.style.display = 'block';
+            }
+        });
+        audio._musicaListeners = true;
+    }
+    if (!btnMusica._musicaClickListener) {
+        // Función para manejar el play/pause y forzar recarga del source
+        function toggleMusica() {
+            audio.muted = false;
+            if (audio.paused) {
+                audio.play().then(() => {
+                    btnMusica.classList.add('musica-activa');
+                    btnMusica.innerHTML = '<i class="fas fa-pause"></i><span>Pausar</span>';
+                    mensajeAudio.style.display = 'none';
+                }).catch(error => {
+                    console.log('Error reproduciendo música:', error);
+                    btnMusica.innerHTML = '<i class="fas fa-play"></i><span>Click para activar</span>';
+                    mensajeAudio.textContent = 'El navegador bloqueó la reproducción automática. Haz click nuevamente o revisa los permisos de audio.';
+                    mensajeAudio.style.display = 'block';
+                });
+            } else {
+                audio.pause();
+                btnMusica.classList.remove('musica-activa');
+                btnMusica.innerHTML = '<i class="fas fa-music"></i><span>Música</span>';
+                mensajeAudio.style.display = 'none';
+            }
+        }
+        btnMusica.addEventListener('click', toggleMusica);
+        btnMusica._musicaClickListener = true;
+    }
+    if (!controlVolumen._musicaVolListener) {
+        controlVolumen.addEventListener('input', function() {
+            audio.volume = this.value / 100;
+        });
+        controlVolumen._musicaVolListener = true;
+    }
+
     // Configurar volumen inicial
     audio.volume = controlVolumen.value / 100;
-    
-    // Función para manejar el play/pause
+
+    // Función para manejar el play/pause y forzar recarga del source
+
     function toggleMusica() {
+        // Desmutear antes de reproducir
+        audio.muted = false;
         if (audio.paused) {
-            // Reproducir música
             audio.play().then(() => {
                 btnMusica.classList.add('musica-activa');
                 btnMusica.innerHTML = '<i class="fas fa-pause"></i><span>Pausar</span>';
+                mensajeAudio.style.display = 'none';
             }).catch(error => {
                 console.log('Error reproduciendo música:', error);
-                // Fallback
                 btnMusica.innerHTML = '<i class="fas fa-play"></i><span>Click para activar</span>';
+                mensajeAudio.textContent = 'El navegador bloqueó la reproducción automática. Haz click nuevamente o revisa los permisos de audio.';
+                mensajeAudio.style.display = 'block';
             });
         } else {
-            // Pausar música
             audio.pause();
             btnMusica.classList.remove('musica-activa');
             btnMusica.innerHTML = '<i class="fas fa-music"></i><span>Música</span>';
+            mensajeAudio.style.display = 'none';
         }
     }
-    
-    // Control de play/pause
+
     btnMusica.addEventListener('click', toggleMusica);
     
     // Control de volumen
